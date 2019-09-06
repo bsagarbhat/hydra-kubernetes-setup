@@ -1,0 +1,35 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: hydra-server-deployment
+spec:
+  selector:
+    matchLabels:
+      app: hydra-server
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: hydra-server
+    spec:
+      containers:
+      - name: hydra-server
+        image: oryd/hydra:v1.0.0
+        ports:
+         - containerPort: 4444
+         - containerPort: 4445
+        env:
+         - name: SECRETS_SYSTEM
+           value: "abcd123456789012"
+         - name: DSN
+           value: "postgres://hydra-user:secret@10.103.217.249:5432/hydra-db?sslmode=disable"
+         - name: URLS_SELF_ISSUER
+           value: "https://localhost:9000/"
+         - name: URLS_CONSENT
+           value: "http://10.106.219.185:3000/consent"
+         - name: URLS_LOGIN
+           value: "http://10.106.219.185:3000/login"
+      initContainers:
+      - name: hydra-migrate
+        image: oryd/hydra:v1.0.0
+        command: ["hydra", "migrate", "sql",  "--yes", "postgres://hydra-user:secret@10.103.217.249:5432/hydra-db?sslmode=disable"]

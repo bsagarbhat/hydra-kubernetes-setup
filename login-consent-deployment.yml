@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-consent-deployment
+spec:
+  selector:
+    matchLabels:
+      app: login-consent-app
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template:
+    metadata:
+      labels:
+        app: login-consent-app
+    spec:
+      containers:
+      - name: login-consent-app
+        image: oryd/hydra-login-consent-node:v1.0.0
+        ports:
+         - containerPort: 3000
+        env:
+         - name: HYDRA_ADMIN_URL
+           value: "http://10.99.75.119:4445"
+         - name: NODE_TLS_REJECT_UNAUTHORIZED
+           value: "0"
